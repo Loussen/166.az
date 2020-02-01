@@ -1,0 +1,18 @@
+<?php
+
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+
+class SiteInfoTableSeeder extends Seeder
+{
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
+    public function run()
+    {
+        DB ::table( \App\Models\Site::TABLE ) -> insert( [ 'title_en' => '166' ] );
+    }
+}
