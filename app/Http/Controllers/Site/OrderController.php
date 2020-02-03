@@ -12,6 +12,7 @@ class OrderController extends Controller
 {
     public function orderPage()
     {
+
         try
         {
             $services = ServiceController ::ALL_SERVICES();
