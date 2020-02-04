@@ -106,6 +106,8 @@ class ServiceInputController extends Controller
 
                 'step' => [ 'type' => 'numeric' , 'required' => true , 'array' => ServiceInput::STEPS ] ,
 
+                'coefficient' => [ 'type' => 'numeric', 'required' => false ] ,
+
                 'service' => [ 'type' => 'numeric' , 'required' => true , 'exist' => Service::TABLE , 'db' => 'id' ]
             ];
 
@@ -125,6 +127,8 @@ class ServiceInputController extends Controller
                     'type' => $type ,
 
                     'step' => $request -> request -> get( 'step' ) ,
+
+                    'coefficient' => $request -> request -> get( 'coefficient' ) ,
 
                     'service_id' => $request -> request -> get( 'service' )
                 ];
@@ -148,6 +152,7 @@ class ServiceInputController extends Controller
                                     'name_en'  => $option[ 'name_en' ] ?? '' ,
                                     'name_az'  => $option[ 'name_az' ] ?? '' ,
                                     'name_ru'  => $option[ 'name_ru' ] ?? '' ,
+                                    'coefficient'  => $option[ 'coefficient' ] ?? '' ,
                                     'input_id' => $id
                                 ]
                             )

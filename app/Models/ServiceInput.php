@@ -30,6 +30,8 @@ class ServiceInput extends Model
             'name_ru' ,
 
             'step' ,
-            'service_id'
+            'service_id',
+
+            'coefficient'
         ];
 }

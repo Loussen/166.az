@@ -116,8 +116,10 @@
 
             $( document ).on( 'change' , '[x-options-show-hide]' , function()
             {
-                if( $( this ).val() == 'select' ) $( '[x-options]' ).removeClass( 'hidden' );
+                $( '[x-coefficient]' ).addClass( 'hidden' );
 
+                if( $( this ).val() == 'select' ) $( '[x-options]' ).removeClass( 'hidden' );
+                else if($( this ).val() == 'number') $('[x-coefficient]').removeClass('hidden');
                 else $( '[x-options]' ).addClass( 'hidden' );
             } );
         } );
@@ -198,6 +200,10 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-sm-4 form-group m-form__group hidden" style="margin: 0 auto; float: none;" x-coefficient>
+                            <label>Coefficient</label>
+                            <input name="coefficient" type="number" step="0.01" class="form-control m-input m-input--air" placeholder="Coefficient" value="<%= rc.coefficient %>">
+                        </div>
                         <div class="col-sm-12 hidden" x-options>
                             <div class="m-portlet" style="margin: 15px;">
                                 <div class="m-portlet__head">
@@ -239,6 +245,9 @@
                     </div>
                     <div class="col-sm-4">
                         <input name="options[<%= rc.k %>][name_ru]" class="form-control m-input m-input--air" placeholder="Name ( RU )" value="<%= rc.name_ru %>">
+                    </div>
+                    <div class="col-sm-4" style="margin: 0 auto; float: none; margin-top: 5px;">
+                        <input name="options[<%= rc.k %>][coefficient]" type="number" step="0.01" class="form-control m-input m-input--air" placeholder="Coefficient" value="<%= rc.coefficient %>">
                     </div>
                 </div>
             </div>

@@ -170,11 +170,11 @@ class ServiceController extends Controller
 
         $id = $validator -> validateId( $request -> request -> get( 'service' ) );
 
-        $serviceInputs = ServiceInput ::where( 'is_deleted' , 0 ) -> where( 'is_active' , 1 ) -> where( 'service_id' , $id ) -> select( 'id' , 'type' , 'step' , static ::LANG_PARAM( 'name' ) ) -> get();
+        $serviceInputs = ServiceInput ::where( 'is_deleted' , 0 ) -> where( 'is_active' , 1 ) -> where( 'service_id' , $id ) -> select( 'id' , 'type' , 'step' , 'coefficient' , static ::LANG_PARAM( 'name' ) ) -> get();
 
         foreach( $serviceInputs as $k => $input )
             if( $input -> type == 'select' )
-                $serviceInputs[ $k ] -> options = ServiceInputOption ::where( 'input_id' , $input -> id ) -> select( 'id' , static ::LANG_PARAM( 'name' ) ) -> get();
+                $serviceInputs[ $k ] -> options = ServiceInputOption ::where( 'input_id' , $input -> id ) -> select( 'id' , 'coefficient' , static ::LANG_PARAM( 'name' ) ) -> get();
 
         $services = Service ::where( 'is_deleted' , 0 ) -> where( 'is_active' , 1 ) -> where( 'parent_id' , $id ) -> select( 'id' , self ::LANG_PARAM( 'name' ) ) -> get();
 

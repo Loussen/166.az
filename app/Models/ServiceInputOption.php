@@ -10,5 +10,5 @@ class ServiceInputOption extends Model
 
     protected $table = self::TABLE;
 
-    protected $fillable = [ 'name_az' , 'name_en' , 'name_ru' , 'input_id' ];
+    protected $fillable = [ 'name_az' , 'name_en' , 'name_ru' , 'input_id', 'coefficient' ];
 }

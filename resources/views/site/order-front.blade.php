@@ -107,14 +107,18 @@
                                     <i class="fas fa-check-circle"></i>
                                     <span>{{ __('message.Step_2') }}</span>
                                 </p>
+                                <div class="order-top__children"></div>
                                 <div class="order-top__inputs"></div>
+                                <div class="order-top__children-inputs"></div>
                             </div>
                             <div class="order-top__right step" id="step_3">
                                 <p>
                                     <i class="fas fa-check-circle"></i>
                                     <span>{{ __('message.Step_3') }}</span>
                                 </p>
+                                <div class="order-top__children"></div>
                                 <div class="order-top__inputs"></div>
+                                <div class="order-top__children-inputs"></div>
                             </div>
                         </div>
                     </div>
@@ -335,9 +339,9 @@
         $(this).parent().remove();
     });
 
-    var addressList = [];
-
-    function post(changeService, $this) {
+   $('body').on('change', '.order-children', function () {
+        let changeService = $(this).find('option:selected').attr('value');
+        let $this = $(this).parents('.order-top');
         let m_id = $($this).attr("data-id");
         let index = parseInt(m_id) - 1;
         $.ajax({
@@ -348,69 +352,52 @@
                 '_token': csrf
             },
             success: function (res) {
-                $($this).find('.order-top__inputs').html('');
-                let arr = res.data;
-                let addressFound = false;
-                for (let input = 0; input < arr.length; input++) {
-                    let appendArea = $($this).find('#step_' + arr[input].step + ' .order-top__inputs');
-                    if (arr[input].type === 'select') {
-                        let htmlSelect =
-                            `
-                             <div class="form-row">
-                                  <label>${arr[input].name}</label>
-                                  <select name="${arr[input].id}">
-                                        ${
-                                arr[input].options.map(item => (
-                                    `<option value="${item.id}">${item.name}</option>`
-                                )).join('')
 
-                                }
+                console.log(res.data);
+                $($this).find('.order-top__children-inputs').html('');
+                let childrenArr = res.data;
 
-                                  </select>
-                            </div>
-                        `;
-                        appendArea.append(htmlSelect);
-                    } else if (arr[input].type === 'input') {
+                for(let ch = 0; ch < childrenArr.length; ch++) {
+                    let appendArea = $($this).find('#step_' + childrenArr[ch].step + ' .order-top__children-inputs');
+                    if(childrenArr[ch].type === 'input') {
                         let htmlInput =
                             `
                             <div class="form-row">
-                                        <label>${arr[input].name}</label>
-                                        <input type="text" id="${arr[input].id}">
+                                        <label>${childrenArr[ch].name}</label>
+                                        <input type="text" name="service[${changeService}][${childrenArr[ch].id}]" id="${childrenArr[ch].id}">
                             </div>
                             `;
                         appendArea.append(htmlInput);
-
-                    } else if (arr[input].type === 'number') {
+                    } else if (childrenArr[ch].type === 'number') {
                         let htmlNumber =
                             `
-
                               <div class="form-row--number form-element--short">
-                                     <label>${arr[input].name}</label>
+                                     <label>${childrenArr[ch].name}</label>
                                         <div class="regulator">
                                              <div class="regulator-minus"><span>-</span></div>
-                                                <input class="regulator-output" type="text" value="0" disabled>
+                                                <input class="regulator-output" name="service[${changeService}][${childrenArr[ch].id}]" type="text" value="0" readonly>
                                              <div class="regulator-plus"><span>+</span></div>
                                         </div>
                               </div>
                             `;
                         appendArea.append(htmlNumber);
-                    } else if (arr[input].type === 'date') {
+                    } else if (childrenArr[ch].type === 'date') {
                         let htmlDate =
                             `
                          <div class="form-row form-row--date">
                                         <div class="form-row--left form-element--short">
-                                            <label for="hour">${arr[input].name}</label>
+                                            <label for="hour">${childrenArr[ch].name}</label>
                                             <div class="select-row">
                                                 <div class="select-icon"><i class="far fa-clock" aria-hidden="true"></i></div>
 
-                                                <input class="datetime-container" placeholder="13:30" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
+                                                <input class="datetime-container" placeholder="13:30" name="service[${changeService}][${childrenArr[ch].id}]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="form-row--right form-element--long">
-                                            <label for="date" style="visibility: hidden;">${arr[input].name}</label>
+                                            <label for="date" style="visibility: hidden;">${childrenArr[ch].name}</label>
                                             <div class="datetime select-row" data-bind="daterangepicker: dateRange">
                                                 <div class="select-icon"><i class="far fa-calendar-check" aria-hidden="true"></i></div>
-                                                <input type="hidden" id="datetime-text" value="16 January 2020">
+                                                <input type="hidden" name="service[${changeService}][${childrenArr[ch].id}]" id="datetime-text" value="16 January 2020">
                                                 <div class="datetime-container">
                                                     <span class="datetime-text">16 January 2020</span>
                                                     <i class="fa fa-sort-down" aria-hidden="true"></i>
@@ -439,18 +426,35 @@
                                 //input values on change end
                             }
                         });
-                    } else if (arr[input].type === 'address') {
+                    } else if (childrenArr[ch].type === 'select') {
+                        let htmlSelect =
+                            `
+                             <div class="form-row">
+                                  <label>${childrenArr[ch].name}</label>
+                                  <select name="service[${changeService}][${childrenArr[ch].id}]">
+                                        ${
+                                childrenArr[ch].options.map(item => (
+                                    `<option value="${item.id}">${item.name}</option>`
+                                )).join('')
+
+                            }
+
+                                  </select>
+                            </div>
+                        `;
+                        appendArea.append(htmlSelect);
+                    } else if (childrenArr[ch].type === 'address') {
                         let htmlAddress =
                             `
                             <div class="form-row">
-                                        <label>${arr[input].name}</label>
-                                        <input type="text" class="order-address" id="${m_id}address${arr[input].id}" name="${arr[input].name}">
+                                        <label>${childrenArr[ch].name}</label>
+                                        <input type="text" class="order-address" name="service[${changeService}][${childrenArr[ch].id}]" id="${m_id}address${childrenArr[ch].id}" name="${childrenArr[ch].name}">
                             </div>
                             `;
                         appendArea.append(htmlAddress);
                         if (!addressList[index]) {
                             addressList.push({
-                                input: [m_id + "address" + arr[input].id],
+                                input: [m_id + "address" + childrenArr[ch].id],
                                 complete: [null],
                                 geometry: [{
                                     text: '',
@@ -463,7 +467,7 @@
                                 core: null
                             });
                         } else {
-                            addressList[index].input.push(m_id + "address" + arr[input].id);
+                            addressList[index].input.push(m_id + "address" + childrenArr[ch].id);
                             addressList[index].complete.push(null);
                             addressList[index].geometry.push({
                                 text: '',
@@ -474,12 +478,12 @@
                         addressFound = true;
                     }
                 }
-
-
                 if (addressFound) {
                     $($this).append('<div class="w-100"><div id="map' + m_id + '" class="googleMap"></div></div>');
                 }
                 setTimeout(function () {
+                    console.log('addreslist');
+                    console.log(addressList);
                     addressList[index].input.map(function (m, i) {
                         let input = document.getElementById(m);
                         google.maps.event.addDomListener(input, 'keydown', function (event) {
@@ -518,9 +522,229 @@
                     });
                 }, 100);
             }
+        });
+
+    });
+
+    var addressList = [];
+
+    function post(changeService, $this) {
+        let m_id = $($this).attr("data-id");
+        let index = parseInt(m_id) - 1;
+        $.ajax({
+            type: 'POST',
+            url: '{{ route('service-inputs') }}',
+            data: {
+                service: changeService,
+                '_token': csrf
+            },
+            success: function (res) {
+                console.log(res);
+                $($this).find('.order-top__inputs').html('');
+                $($this).find('.order-top__children').html('');
+                $($this).find('.order-top__children-inputs').html('');
+                addressList = [];
+                let arr = res.data;
+                let childrenArr = res.children;
+                console.log(arr);
+                console.log(childrenArr);
+                let arrLength = childrenArr.length;
+                if(arrLength > 0) {
+
+                        let childrenSelect =
+                            `
+                             <div class="form-row">
+                                  <label>Xidmətin növü</label>
+                                  <select class="order-children" name="service[${changeService}][children]}]">
+                                        ${
+                                childrenArr.map(item => (
+                                    `<option value="${item.id}">${item.name}</option>`
+                                )).join('')
+
+                            }
+
+                                  </select>
+                            </div>
+                        `;
+
+                        $($this).find('#step_2 .order-top__children').append(childrenSelect);
+                    }
+
+
+
+
+                let addressFound = false;
+                for (let input = 0; input < arr.length; input++) {
+                    let appendArea = $($this).find('#step_' + arr[input].step + ' .order-top__inputs');
+                    if (arr[input].type === 'select') {
+                        let htmlSelect =
+                            `
+                             <div class="form-row">
+                                  <label>${arr[input].name}</label>
+                                  <select name="service[${changeService}][${arr[input].id}]">
+                                        ${
+                                arr[input].options.map(item => (
+                                    `<option value="${item.id}">${item.name}</option>`
+                                )).join('')
+
+                                }
+
+                                  </select>
+                            </div>
+                        `;
+                        appendArea.append(htmlSelect);
+                    } else if (arr[input].type === 'input') {
+                        let htmlInput =
+                            `
+                            <div class="form-row">
+                                        <label>${arr[input].name}</label>
+                                        <input type="text" name="service[${changeService}][${arr[input].id}]" id="${arr[input].id}">
+                            </div>
+                            `;
+                        appendArea.append(htmlInput);
+
+                    } else if (arr[input].type === 'number') {
+                        let htmlNumber =
+                            `
+
+                              <div class="form-row--number form-element--short">
+                                     <label>${arr[input].name}</label>
+                                        <div class="regulator">
+                                             <div class="regulator-minus"><span>-</span></div>
+                                                <input class="regulator-output" name="service[${changeService}][${arr[input].id}]" type="text" value="0" readonly>
+                                             <div class="regulator-plus"><span>+</span></div>
+                                        </div>
+                              </div>
+                            `;
+                        appendArea.append(htmlNumber);
+                    } else if (arr[input].type === 'date') {
+                        let htmlDate =
+                            `
+                         <div class="form-row form-row--date">
+                                        <div class="form-row--left form-element--short">
+                                            <label for="hour">${arr[input].name}</label>
+                                            <div class="select-row">
+                                                <div class="select-icon"><i class="far fa-clock" aria-hidden="true"></i></div>
+
+                                                <input class="datetime-container" placeholder="13:30" name="service[${changeService}][${arr[input].id}]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
+                                            </div>
+                                        </div>
+                                        <div class="form-row--right form-element--long">
+                                            <label for="date" style="visibility: hidden;">${arr[input].name}</label>
+                                            <div class="datetime select-row" data-bind="daterangepicker: dateRange">
+                                                <div class="select-icon"><i class="far fa-calendar-check" aria-hidden="true"></i></div>
+                                                <input type="hidden" name="service[${changeService}][${arr[input].id}]" id="datetime-text" value="16 January 2020">
+                                                <div class="datetime-container">
+                                                    <span class="datetime-text">16 January 2020</span>
+                                                    <i class="fa fa-sort-down" aria-hidden="true"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                          `;
+                        appendArea.append(htmlDate);
+                        $('#datetimepicker1').datetimepicker({
+                            format: 'LT',
+                            locale: 'az'
+                        });
+                        $(".datetime-text").text(moment().format('D MMMM YYYY'));
+                        $("#datetime-text").val(moment().format('D MMMM YYYY'));
+                        $(".datetime").daterangepicker({
+                            orientation: 'left',
+                            expanded: true,
+                            single: true,
+                            locale: {applyButtonTitle: 'Apply', cancelButtonTitle: 'Cancel', endLabel: 'End', startLabel: 'Start'},
+                            callback: function (endDate) {
+                                $(this).find(".datetime-text").text(endDate.format('D MMMM YYYY'));
+                                //input values on change start
+                                $(this).find("#datetime-text").val(endDate.format('D MMMM YYYY'));
+                                //input values on change end
+                            }
+                        });
+                    } else if (arr[input].type === 'address') {
+                        let htmlAddress =
+                            `
+                            <div class="form-row">
+                                        <label>${arr[input].name}</label>
+                                        <input type="text" class="order-address" name="service[${changeService}][${arr[input].id}]" id="${m_id}address${arr[input].id}" name="${arr[input].name}">
+                            </div>
+                            `;
+                        appendArea.append(htmlAddress);
+                        if (!addressList[index]) {
+                            addressList.push({
+                                input: [m_id + "address" + arr[input].id],
+                                complete: [null],
+                                geometry: [{
+                                    text: '',
+                                    lat: null,
+                                    lng: null
+                                }],
+                                directionsService: null,
+                                directionsDisplay: null,
+                                marker: null,
+                                core: null
+                            });
+                        } else {
+                            addressList[index].input.push(m_id + "address" + arr[input].id);
+                            addressList[index].complete.push(null);
+                            addressList[index].geometry.push({
+                                text: '',
+                                lat: null,
+                                lng: null
+                            });
+                        }
+                        addressFound = true;
+                    }
+                }
+
+                if (addressFound) {
+                    $($this).append('<div class="w-100"><div id="map' + m_id + '" class="googleMap"></div></div>');
+                }
+                setTimeout(function () {
+                    console.log('addreslist');
+                    console.log(addressList);
+                    addressList[index].input.map(function (m, i) {
+                        let input = document.getElementById(m);
+                        google.maps.event.addDomListener(input, 'keydown', function (event) {
+                            if (event.keyCode === 13) {
+                                event.preventDefault();
+                            }
+                        });
+                        addressList[index].complete[i] = new google.maps.places.Autocomplete((input), {types: ['geocode']});
+                        addressList[index].complete[i].addListener('place_changed', function () {
+                            let place = addressList[index].complete[i].getPlace();
+                            addressList[index].geometry[i].text = place.formatted_address;
+                            if (place.geometry.location) {
+                                addressList[index].geometry[i].lat = place.geometry.location.lat();
+                                addressList[index].geometry[i].lng = place.geometry.location.lng();
+                            }
+                            let found = 0;
+                            addressList[index].geometry.map(geo => {
+                                if (geo.text !== '') found++;
+                            });
+                            if (found > 0) {
+                                $($this).find("#map" + m_id).show();
+                            }
+                            if (found === 1) {
+                                if (addressList[index].core !== null) {
+                                    setMarker(addressList[index], true);
+                                } else {
+                                    initMap("map" + m_id, addressList[index])
+                                }
+                            } else if (found > 1) {
+                                setMarker(addressList[index], false);
+                                setDirection(addressList[index]);
+                            } else {
+                                $($this).find("#map" + m_id).hide();
+                            }
+                        });
+                    });
+                }, 100);
+
+            }
         })
     }
-
 
     function initMap(mapId, addressList) {
         addressList.directionsDisplay = new google.maps.DirectionsRenderer({});
@@ -584,14 +808,76 @@
             if (status === 'OK') {
                 addressList.directionsDisplay.setDirections(response);
 
-
                 console.log(response);
 
             } else {
                 alert("something went wrong")
             }
         });
+
+        console.log(addressList);
     }
+
+    $('body').on('change', 'input[name=name]', function () {
+        alert("sadasd");
+       postCalc();
+    });
+
+    function postCalc(){
+        var form = $('div.modal-service__body form.form').serializeArray();
+        form.push({_token: csrf});
+
+        $.ajax({
+            method: "POST",
+            url: '{{ route('calculate') }}',
+            data: form,
+            success: function (res) {
+                console.log(res);
+            }
+        });
+    }
+
+    $('[x-order-form]').submit(function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        /*var formData = new FormData(this);
+        console.log(formData);
+
+        formData.append( '_token' , csrf );*/
+        /*var formData = $('[x-order-form]').serializeArray();
+        formData.push({'_token': csrf});
+        var formdata2 = JSON.stringify(formData);
+        console.log(formdata2);
+
+        $.ajax({
+            type: 'POST',
+            url: '{{ route('service-inputs') }}',
+            data: formdata2,
+            cache : false ,
+            contentType : false ,
+            processData : false ,
+            success: function (res) {
+                console.log(res);
+            }
+        });*/
+
+        const formData = new FormData(this);
+        formData.append( '_token' , csrf );
+
+
+        console.log(formData);
+
+        fetch('{{ route('order') }}' , {
+            method: 'post',
+            body: formData
+        }).then(function (res) {
+            console.log(res);
+        }).catch(function (err) {
+            console.log(err);
+        });
+
+    });
+
 
 </script>
 <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false&libraries=places,geometry&key=AIzaSyA50XWgVLv-Ngl_8aHhc2ZYknY516xEqTg&language=az"></script>

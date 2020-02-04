@@ -12,7 +12,6 @@ class OrderController extends Controller
 {
     public function orderPage()
     {
-
         try
         {
             $services = ServiceController ::ALL_SERVICES();
@@ -32,61 +31,58 @@ class OrderController extends Controller
     {
         try
         {
-            $services = [];
+            var_dump($_POST); exit;
+            $service = $request -> request -> getInt( 'service' );
 
-            $data = [ 'price' => 0 ];
+            $data = [];
 
             $validations = [
-                'services' => [ 'type' => 'array' , 'required' => true ] ,
-                'name'     => [ 'type' => 'string' , 'required' => true , 'max' => 55 ] ,
-                'phone'    => [ 'type' => 'string' , 'required' => true , 'max' => 22 ]
+                'service' => [ 'type' => 'numeric' , 'required' => true , 'exist' => Service::TABLE , 'db' => 'id' ] ,
+                'name'    => [ 'type' => 'string' , 'required' => true , 'max' => 55 ] ,
+                'phone'   => [ 'type' => 'string' , 'required' => true , 'max' => 22 ]
             ];
 
             $validations = $this -> validator -> validateForm( $request , $validations );
 
             if( ! count( $validations ) )
             {
-                foreach( $request -> request -> get( 'services' ) as $parent => $inputs )
-                {
-                    $parentData = Service ::where( 'id' , $parent ) -> select( 'price' , self ::LANG_PARAM( 'name' ) ) -> first();
 
-                    $service = $inputs[ 'service' ] ?? '';
-
-                    $serviceData = Service ::where( 'id' , $service ) -> select( 'price' , self ::LANG_PARAM( 'name' ) ) -> first();
-
-                    $data[ 'price' ] += $services[ $parent ][ 'price' ] = $data[ 'services' ][ $parent ][ 'price' ] = ( isset( $parentData -> price ) ? $parentData -> price : 0 ) + ( isset( $serviceData -> price ) ? $serviceData -> price : 0 );
-                }
-
-                if( $request -> request -> get( 'order' ) == 1 )
-                {
-                    foreach( $request -> request -> get( 'services' ) as $parent => $inputs )
-                    {
-                        $parentData = Service ::where( 'id' , $parent ) -> select( 'price' , self ::LANG_PARAM( 'name' ) ) -> first();
-
-                        $service = $inputs[ 'service' ] ?? '';
-
-                        $serviceData = Service ::where( 'id' , $service ) -> select( 'price' , self ::LANG_PARAM( 'name' ) ) -> first();
-
-                        $data[ 'price' ] += $data[ 'services' ][ $parent ][ 'price' ] = ( isset( $parentData -> price ) ? $parentData -> price : 0 ) + ( isset( $serviceData -> price ) ? $serviceData -> price : 0 );
-                    }
-
-                    Mail ::send( 'mail.order-admin' , [
-                        'name'     => $request -> request -> get( 'name' ) ,
-                        'phone'    => $request -> request -> get( 'phone' ) ,
-                        'services' => $services ,
-                        'price'    => $data[ 'price' ] ,
-                    ] , function( $message )
-                    {
-                        $message -> to( env( 'EMAIL' ) )
-                                 -> subject( 'New order' )
-                        ;
-                    } );
-
-                    return response() -> json( [ 'status' => 'success' ] );
-                }
             }
 
             return response() -> json( [ 'status' => 'success' , 'data' => $data , 'validations' => $validations ] );
+        }
+        catch( \Exception $exception )
+        {
+            return $this -> getException( $exception );
+        }
+    }
+
+
+    public function order( Request $request )
+    {
+        try
+        {
+            $parent = Service ::where( 'id' , $request -> request -> get( 'parent' ) ) -> select( self ::LANG_PARAM( 'name' ) ) -> first();
+
+            $service = Service ::where( 'id' , $request -> request -> get( 'service' ) ) -> select( self ::LANG_PARAM( 'name' ) ) -> first();
+
+//            Mail ::send( 'mail.order-admin' , [
+//                'name'      => $request -> request -> get( 'name' ) ,
+//                'phone'     => $request -> request -> get( 'phone' ) ,
+//                'address_1' => $request -> request -> get( 'address_1' ) ,
+//                'address_2' => $request -> request -> get( 'address_2' ) ,
+//                'date'      => $request -> request -> get( 'date' ) ,
+//                'hour'      => $request -> request -> get( 'hour' ) ,
+//                'parent'    => $parent -> name ,
+//                'service'   => isset( $service -> name ) ? $service -> name : null ,
+//            ] , function( $message )
+//            {
+//                $message -> to( env( 'EMAIL' ) )
+//                         -> subject( 'New order' )
+//                ;
+//            } );
+
+            return response() -> json( [ 'status' => 'success' ] );
         }
         catch( \Exception $exception )
         {
