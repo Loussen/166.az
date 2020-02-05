@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
+
     const ADMIN_ROLE = 'admin';
 
 
