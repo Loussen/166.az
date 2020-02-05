@@ -76,7 +76,7 @@
                 <h6>{{ __('message.Order_Service') }}</h6>
             </div>
             <div class="modal-body modal-service__body">
-                <form action="{{ route('order') }}" method="post" x-order-form x-target="afterOrder" class="form">
+                <form action="{{ route('order') }}" method="post" x-order-form x-target="afterOrder" class="form order-form">
                     <div id="order-forms" class="order-forms">
                         <div class="order-top" data-id="1">
                             <div class="order-top__left step">
@@ -738,6 +738,8 @@
                             } else {
                                 $($this).find("#map" + m_id).hide();
                             }
+
+                            postCalc();
                         });
                     });
                 }, 100);
@@ -818,21 +820,40 @@
         console.log(addressList);
     }
 
-    $('body').on('change', 'input[name=name]', function () {
-        alert("sadasd");
-       postCalc();
+    $('body').on('change', 'select,input', function (event) {
+        if($(this).hasClass('order-address'))
+        {
+            event.preventDefault();
+        }
+        else
+        {
+            postCalc();
+        }
+    });
+
+    $('body').on('mouseup', 'div.regulator-plus,div.regulator-minus', function(){
+        setTimeout(function() {
+            postCalc();
+        }, 100);
     });
 
     function postCalc(){
-        var form = $('div.modal-service__body form.form').serializeArray();
-        form.push({_token: csrf});
+        console.log("salam");
+        console.log(addressList.directionsDisplay);
+        var form = $('div.modal-service__body form.order-form').serializeArray();
+        form.push({name: '_token', value: csrf});
 
         $.ajax({
             method: "POST",
             url: '{{ route('calculate') }}',
             data: form,
             success: function (res) {
-                console.log(res);
+                let total = res.total;
+
+                total = Math.round(total * 100) / 100;
+
+                $('[x-order-selected-service-price]').html(total);
+                console.log(total);
             }
         });
     }

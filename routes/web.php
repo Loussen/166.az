@@ -261,3 +261,7 @@ Route ::post( 'service-inputs' , 'Site\ServiceController@getServiceInputs' ) -> 
 Route ::post( 'calculate' , 'Site\OrderController@calculate' ) -> name( 'calculate' );
 Route ::post( 'order' , 'Site\OrderController@order' ) -> name( 'order' );
 
+//KapitalBank Callback
+Route ::post( 'order_approved' , 'Site\OrderController@order_approved' ) -> name( 'order_approved' );
+Route ::post( 'order_canceled' , 'Site\OrderController@order_canceled' ) -> name( 'order_canceled' );
+Route ::post( 'order_declined' , 'Site\OrderController@order_declined' ) -> name( 'order_declined' );
