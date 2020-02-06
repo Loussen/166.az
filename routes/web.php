@@ -38,6 +38,15 @@ Route ::middleware( [ 'auth' ] ) -> prefix( 'admin' ) -> name( 'admin.' ) -> gro
     Route ::post( 'admin/activate' , 'Admin\AdminController@activateAdmin' ) -> name( 'admin.activate' );
     Route ::post( 'admin/delete' , 'Admin\AdminController@deleteAdmin' ) -> name( 'admin.delete' );
 
+    // Order
+    Route ::get( 'orders' , 'Admin\OrderController@showOrderPage' ) -> name( 'order.page' );
+    Route ::post( 'order/list' , 'Admin\OrderController@getOrderList' ) -> name( 'order.list' );
+    Route ::post( 'order' , 'Admin\OrderController@getOrder' ) -> name( 'order.get' );
+    Route ::post( 'order/edit' , 'Admin\OrderController@editOrder' ) -> name( 'order.edit' );
+    Route ::post( 'order/activate' , 'Admin\OrderController@activateOrder' ) -> name( 'order.activate' );
+    Route ::post( 'order/delete' , 'Admin\OrderController@deleteOrder' ) -> name( 'order.delete' );
+    Route ::post( 'order/search' , 'Admin\OrderController@getOrderSearch' ) -> name( 'order.search' );
+
     // Service
     Route ::get( 'services' , 'Admin\ServiceController@showServicePage' ) -> name( 'service.page' );
     Route ::post( 'service/list' , 'Admin\ServiceController@getServiceList' ) -> name( 'service.list' );
