@@ -213,4 +213,6 @@ return [
     'Date_of_entry'                                             => 'Date of entry' ,
     'Date_of_departure'                                         => 'Date of departure' ,
     'Reason_of_towing'                                          => 'Reason of towing' ,
+    'Payment'                                                   => 'Payment',
+
 ];

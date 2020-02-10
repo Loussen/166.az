@@ -47,6 +47,7 @@ Route ::middleware( [ 'auth' ] ) -> prefix( 'admin' ) -> name( 'admin.' ) -> gro
     Route ::post( 'order/delete' , 'Admin\OrderController@deleteOrder' ) -> name( 'order.delete' );
     Route ::post( 'order/search' , 'Admin\OrderController@getOrderSearch' ) -> name( 'order.search' );
 
+
     // Service
     Route ::get( 'services' , 'Admin\ServiceController@showServicePage' ) -> name( 'service.page' );
     Route ::post( 'service/list' , 'Admin\ServiceController@getServiceList' ) -> name( 'service.list' );
@@ -198,6 +199,12 @@ Route ::get( '404' , 'Site\SiteController@_404' ) -> name( '_404' );
 
 Route ::middleware( [ 'language' ] ) -> prefix( '{locale?}' ) -> name( 'site.' ) -> group( function()
 {
+
+    //KapitalBank Callback
+    Route ::post( 'order_approved' , 'Site\OrderController@order_approved' ) -> name( 'order_approved' );
+    Route ::post( 'order_canceled' , 'Site\OrderController@order_canceled' ) -> name( 'order_canceled' );
+    Route ::post( 'order_declined' , 'Site\OrderController@order_declined' ) -> name( 'order_declined' );
+
     // Home
     Route ::get( '/' , 'Site\SiteController@homepage' ) -> name( 'home' );
 
@@ -270,7 +277,4 @@ Route ::post( 'service-inputs' , 'Site\ServiceController@getServiceInputs' ) -> 
 Route ::post( 'calculate' , 'Site\OrderController@calculate' ) -> name( 'calculate' );
 Route ::post( 'order' , 'Site\OrderController@order' ) -> name( 'order' );
 
-//KapitalBank Callback
-Route ::post( 'order_approved' , 'Site\OrderController@order_approved' ) -> name( 'order_approved' );
-Route ::post( 'order_canceled' , 'Site\OrderController@order_canceled' ) -> name( 'order_canceled' );
-Route ::post( 'order_declined' , 'Site\OrderController@order_declined' ) -> name( 'order_declined' );
+

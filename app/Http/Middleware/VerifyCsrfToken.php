@@ -14,6 +14,9 @@ class VerifyCsrfToken extends Middleware
     protected $except
         = [
             'test' ,
-            'calculate'
+            'calculate',
+            '*/order_approved',
+            '*/order_declined',
+            '*/order_canceled',
         ];
 }

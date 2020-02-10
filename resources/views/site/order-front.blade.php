@@ -77,6 +77,7 @@
             </div>
             <div class="modal-body modal-service__body">
                 <form action="{{ route('order') }}" method="post" x-order-form x-target="afterOrder" class="form order-form">
+                    <input type="hidden" name="csrf_token" id="csrf-token" value="<?=md5(rand(1,99999))?>" />
                     <div id="order-forms" class="order-forms">
                         <div class="order-top" data-id="1">
                             <div class="order-top__left step">
@@ -86,7 +87,7 @@
                                 </p>
                                 <div class="form-row">
                                     <label>{{ __('message.Service') }}</label>
-                                    <select id="step1" name="parent">
+                                    <select id="step1" name="services[1][parent]">
                                         @foreach( $services as $service )
                                             <option value="{{ $service -> id }}" class="service_{{ $service -> id }}">{{ $service -> name }}</option>
                                         @endforeach
@@ -157,13 +158,14 @@
                                     <p><strong>10%</strong> ENDİRİM</p>
                                 </div>
                                 <div class="order-all__center">
-                                    <p><span x-order-selected-service>Yükdaşıma xidməti</span>:
-                                        <strong><span x-order-selected-service-price>500</span> AZN</strong>
+                                    <p>
+                                        <span x-order-selected-service>Yükdaşıma xidməti</span>:
+                                        <strong><span x-order-selected-service-price>0</span> AZN</strong>
                                     </p>
                                 </div>
                                 <div class="order-all__right">
-                                    <h2 class="hidden">{{ __('message.Final_price') }}:
-                                        <strong><span x-order-final-price>630</span> AZN</strong>
+                                    <h2 class="">{{ __('message.Final_price') }}:
+                                        <strong><span x-order-final-price>0</span> AZN</strong>
                                     </h2>
                                     <div class="form-submit form-animated">
                                         <button type="submit" x-order-submit style="width: 208px;">
@@ -240,9 +242,11 @@
         let changeService = $(this).find('option:selected').attr('value');
         let $this = $(this).parents('.order-top');
 
-
         post(changeService, $this);
 
+        setTimeout(function() {
+            postCalc($this);
+        }, 200);
     });
 
     $('body').on('click', '#order-new', function () {
@@ -264,7 +268,7 @@
                                 </p>
                                 <div class="form-row">
                                     <label>{{ __('message.Service') }}</label>
-                                    <select id="step1" name="parent">
+                                    <select id="step1" name="services[${orderLenght}][parent]">
                                         @foreach( $services as $service )
                 <option value="{{ $service -> id }}" class="service_{{ $service -> id }}">{{ $service -> name }}</option>
                                         @endforeach
@@ -306,7 +310,7 @@
         $('.order-top').each(function () {
             var dataIdService = $(this).attr('data-id');
             if (dataIdService == orderLenght) {
-                orderServiceText = $(this).find('.order-top__left select[name="parent"] option:selected').text();
+                orderServiceText = $(this).find('.order-top__left select[name="services['+dataIdService+'][parent]"] option:selected').text();
                 return orderServiceText;
             }
         });
@@ -324,6 +328,11 @@
             `
 
         $('#order-ready').append(newServiceDeleteButton);
+        let homeServiceValue = $('.select-service').find('option:selected').attr('value');
+        let $this = $( "div.order-top" ).last();
+
+        console.log("salam");
+        post(homeServiceValue,$this);
 
     });
 
@@ -364,7 +373,7 @@
                             `
                             <div class="form-row">
                                         <label>${childrenArr[ch].name}</label>
-                                        <input type="text" name="service[${changeService}][${childrenArr[ch].id}]" id="${childrenArr[ch].id}">
+                                        <input type="text" name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]" id="${childrenArr[ch].id}">
                             </div>
                             `;
                         appendArea.append(htmlInput);
@@ -375,7 +384,7 @@
                                      <label>${childrenArr[ch].name}</label>
                                         <div class="regulator">
                                              <div class="regulator-minus"><span>-</span></div>
-                                                <input class="regulator-output" name="service[${changeService}][${childrenArr[ch].id}]" type="text" value="0" readonly>
+                                                <input class="regulator-output" name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]" type="text" value="0" readonly>
                                              <div class="regulator-plus"><span>+</span></div>
                                         </div>
                               </div>
@@ -390,14 +399,14 @@
                                             <div class="select-row">
                                                 <div class="select-icon"><i class="far fa-clock" aria-hidden="true"></i></div>
 
-                                                <input class="datetime-container" placeholder="13:30" name="service[${changeService}][${childrenArr[ch].id}]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
+                                                <input class="datetime-container" placeholder="13:30" name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="form-row--right form-element--long">
                                             <label for="date" style="visibility: hidden;">${childrenArr[ch].name}</label>
                                             <div class="datetime select-row" data-bind="daterangepicker: dateRange">
                                                 <div class="select-icon"><i class="far fa-calendar-check" aria-hidden="true"></i></div>
-                                                <input type="hidden" name="service[${changeService}][${childrenArr[ch].id}]" id="datetime-text" value="16 January 2020">
+                                                <input type="hidden" name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]" id="datetime-text" value="16 January 2020">
                                                 <div class="datetime-container">
                                                     <span class="datetime-text">16 January 2020</span>
                                                     <i class="fa fa-sort-down" aria-hidden="true"></i>
@@ -431,7 +440,7 @@
                             `
                              <div class="form-row">
                                   <label>${childrenArr[ch].name}</label>
-                                  <select name="service[${changeService}][${childrenArr[ch].id}]">
+                                  <select name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]">
                                         ${
                                 childrenArr[ch].options.map(item => (
                                     `<option value="${item.id}">${item.name}</option>`
@@ -448,7 +457,7 @@
                             `
                             <div class="form-row">
                                         <label>${childrenArr[ch].name}</label>
-                                        <input type="text" class="order-address" name="service[${changeService}][${childrenArr[ch].id}]" id="${m_id}address${childrenArr[ch].id}" name="${childrenArr[ch].name}">
+                                        <input type="text" class="order-address" name="services[${m_id}][service[[${changeService}][${childrenArr[ch].id}]]]" id="${m_id}address${childrenArr[ch].id}" name="${childrenArr[ch].name}">
                             </div>
                             `;
                         appendArea.append(htmlAddress);
@@ -478,6 +487,8 @@
                         addressFound = true;
                     }
                 }
+
+                $($this).append('<input type="hidden" name="services[${m_id}][addressInfo]" class="address-info">');
                 if (addressFound) {
                     $($this).append('<div class="w-100"><div id="map' + m_id + '" class="googleMap"></div></div>');
                 }
@@ -549,13 +560,15 @@
                 console.log(arr);
                 console.log(childrenArr);
                 let arrLength = childrenArr.length;
+                console.log("Children");
+                console.log(childrenArr);
                 if(arrLength > 0) {
 
                         let childrenSelect =
                             `
                              <div class="form-row">
                                   <label>Xidmətin növü</label>
-                                  <select class="order-children" name="service[${changeService}][children]}]">
+                                  <select class="order-children" name="services[${m_id}][children]">
                                         ${
                                 childrenArr.map(item => (
                                     `<option value="${item.id}">${item.name}</option>`
@@ -581,7 +594,7 @@
                             `
                              <div class="form-row">
                                   <label>${arr[input].name}</label>
-                                  <select name="service[${changeService}][${arr[input].id}]">
+                                  <select name="services[${m_id}][${arr[input].id}]">
                                         ${
                                 arr[input].options.map(item => (
                                     `<option value="${item.id}">${item.name}</option>`
@@ -598,7 +611,7 @@
                             `
                             <div class="form-row">
                                         <label>${arr[input].name}</label>
-                                        <input type="text" name="service[${changeService}][${arr[input].id}]" id="${arr[input].id}">
+                                        <input type="text" name="services[${m_id}][${arr[input].id}]" id="${arr[input].id}">
                             </div>
                             `;
                         appendArea.append(htmlInput);
@@ -611,7 +624,7 @@
                                      <label>${arr[input].name}</label>
                                         <div class="regulator">
                                              <div class="regulator-minus"><span>-</span></div>
-                                                <input class="regulator-output" name="service[${changeService}][${arr[input].id}]" type="text" value="0" readonly>
+                                                <input class="regulator-output" name="services[${m_id}][${arr[input].id}]" type="text" value="0" readonly>
                                              <div class="regulator-plus"><span>+</span></div>
                                         </div>
                               </div>
@@ -626,14 +639,14 @@
                                             <div class="select-row">
                                                 <div class="select-icon"><i class="far fa-clock" aria-hidden="true"></i></div>
 
-                                                <input class="datetime-container" placeholder="13:30" name="service[${changeService}][${arr[input].id}]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
+                                                <input class="datetime-container" placeholder="13:30" name="services[${m_id}][${arr[input].id}]" id="datetimepicker1" data-target="#datetimepicker1" data-toggle="datetimepicker" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="form-row--right form-element--long">
                                             <label for="date" style="visibility: hidden;">${arr[input].name}</label>
                                             <div class="datetime select-row" data-bind="daterangepicker: dateRange">
                                                 <div class="select-icon"><i class="far fa-calendar-check" aria-hidden="true"></i></div>
-                                                <input type="hidden" name="service[${changeService}][${arr[input].id}]" id="datetime-text" value="16 January 2020">
+                                                <input type="hidden" name="services[${m_id}][${arr[input].id}]" id="datetime-text" value="16 January 2020">
                                                 <div class="datetime-container">
                                                     <span class="datetime-text">16 January 2020</span>
                                                     <i class="fa fa-sort-down" aria-hidden="true"></i>
@@ -667,7 +680,7 @@
                             `
                             <div class="form-row">
                                         <label>${arr[input].name}</label>
-                                        <input type="text" class="order-address" name="service[${changeService}][${arr[input].id}]" id="${m_id}address${arr[input].id}" name="${arr[input].name}">
+                                        <input type="text" class="order-address" name="services[${m_id}][${arr[input].id}]" id="${m_id}address${arr[input].id}" name="${arr[input].name}">
                             </div>
                             `;
                         appendArea.append(htmlAddress);
@@ -697,7 +710,7 @@
                         addressFound = true;
                     }
                 }
-
+                $($this).append('<input type="hidden" name="services['+m_id+'][addressInfo]" class="address-info">');
                 if (addressFound) {
                     $($this).append('<div class="w-100"><div id="map' + m_id + '" class="googleMap"></div></div>');
                 }
@@ -734,12 +747,19 @@
                                 }
                             } else if (found > 1) {
                                 setMarker(addressList[index], false);
-                                setDirection(addressList[index]);
+                                setDirection(addressList[index],$this);
                             } else {
                                 $($this).find("#map" + m_id).hide();
                             }
 
-                            postCalc();
+                            // console.log("=================POST FUNCTION=========");
+                            // console.log("Address list");
+                            // console.log(addressList[index]);
+                            // console.log("Geometry");
+                            // console.log(setDirection(addressList[index]));
+
+                            // var directions = setDirection(addressList[index]);
+
                         });
                     });
                 }, 100);
@@ -784,7 +804,8 @@
         addressList.directionsDisplay.setMap(addressList.core);
     }
 
-    function setDirection(addressList) {
+    function setDirection(addressList,$this=null) {
+        console.log($this);
         let geometry_data = addressList.geometry;
         let geometry = [];
         geometry_data.map(lm => {
@@ -809,38 +830,54 @@
         }, (response, status) => {
             if (status === 'OK') {
                 addressList.directionsDisplay.setDirections(response);
-
-                console.log(response);
-
+                console.log("Address changed");
+                postCalc($this,response);
+                // console.log("OKIS");
+                //
+                // console.log("=================SET DIRECTIONS=========");
+                // console.log("Address list");
+                // console.log(addressList);
+                // console.log("Geometry 1");
+                // console.log(response);
+                // return addressList;
             } else {
                 alert("something went wrong")
             }
         });
-
-        console.log(addressList);
     }
 
     $('body').on('change', 'select,input', function (event) {
+        console.log("select");
         if($(this).hasClass('order-address'))
         {
             event.preventDefault();
         }
         else
         {
-            postCalc();
+            postCalc($(this));
         }
     });
 
     $('body').on('mouseup', 'div.regulator-plus,div.regulator-minus', function(){
+        let thisVar = $(this);
         setTimeout(function() {
-            postCalc();
+            postCalc(thisVar);
         }, 100);
     });
 
-    function postCalc(){
-        console.log("salam");
-        console.log(addressList.directionsDisplay);
-        var form = $('div.modal-service__body form.order-form').serializeArray();
+    function postCalc($this,addressList=null){
+        let form = $('div.modal-service__body form.order-form').serializeArray();
+        if(addressList!=null)
+        {
+            console.log("AddressList:"+addressList);
+            let distance = Math.round(addressList['routes'][0]['legs'][0]['distance']['value'] / 1000 * 10) / 10; // with km
+            let duration = Math.round(addressList['routes'][0]['legs'][0]['duration']['value'] / 60) ; // with hour
+
+            $($this).closest('div.order-top').find('input.address-info').val(distance+"-"+duration);
+
+            form.push({name: 'addressInfo', value: $($this).closest('div.order-top').find('input.address-info').val()});
+        }
+
         form.push({name: '_token', value: csrf});
 
         $.ajax({
@@ -848,12 +885,25 @@
             url: '{{ route('calculate') }}',
             data: form,
             success: function (res) {
-                let total = res.total;
+                let data = JSON.parse(JSON.stringify(res));
+                let total = data.total;
 
                 total = Math.round(total * 100) / 100;
 
-                $('[x-order-selected-service-price]').html(total);
-                console.log(total);
+                if(Object.keys(data.servicesInfo).length>0)
+                {
+                    var servicesInfoLength = Object.keys(data.servicesInfo).length;
+
+                    $("div.order-all__center").html("");
+                    for(var i=1; i<=servicesInfoLength; i++)
+                    {
+                        console.log(data.servicesInfo[i].name);
+                        $("div.order-all__center").append("<p class='selected-service-"+i+"'><span x-order-selected-service>"+data.servicesInfo[i].name+"</span>:<strong><span x-order-selected-service-price>"+data.servicesInfo[i].total+"</span> AZN</strong></p>");
+                    }
+                }
+
+                $('[x-order-final-price]').html(total);
+
             }
         });
     }
@@ -891,7 +941,12 @@
         fetch('{{ route('order') }}' , {
             method: 'post',
             body: formData
-        }).then(function (res) {
+        }).then(response => response.json())
+            .then(responseJson => {
+            if(responseJson.status=='success')
+            {
+                window.location.href = responseJson.redirect;
+            }
             console.log(res);
         }).catch(function (err) {
             console.log(err);
@@ -901,4 +956,4 @@
 
 
 </script>
-<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false&libraries=places,geometry&key=AIzaSyA50XWgVLv-Ngl_8aHhc2ZYknY516xEqTg&language=az"></script>
+<script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=false&libraries=places,geometry&key=AIzaSyA0itE8q6DY9HXmOG1ew0PFqc57t0ml_pM&language=az"></script>

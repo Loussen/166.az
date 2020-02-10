@@ -23,21 +23,21 @@ class CampaignController extends Controller
         try
         {
             $economCampaigns = DB ::table( EconomCampaign::TABLE . ' AS c' )
-                                  -> join( Service::TABLE . ' AS s' , 'c.service_id' , 's.id' )
-                                  -> leftJoin( EconomCampaignInclude::TABLE . ' AS i' , 'c.id' , 'i.campaign_id' )
-                                  -> where( 'c.is_deleted' , 0 ) -> where( 'c.is_active' , 1 )
-                                  -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
-                                  -> groupBy( 'c.id' , self ::LANG_PARAM( 'title' , '' , false ) , self ::LANG_PARAM( 'individual_text' , '' , false ) , self ::LANG_PARAM( 'corporate_text' , '' , false ) , 'price' , 'service_id' , 'c.photo' )
-                                  -> select( 'c.id' , self ::LANG_PARAM( 'title' ) , self ::LANG_PARAM( 'individual_text' ) , self ::LANG_PARAM( 'corporate_text' ) , 'price' , 'service_id' , DB ::raw( "GROUP_CONCAT( i.activity_id SEPARATOR ',' ) AS includes" ) , 'c.photo' )
-                                  -> get()
+                -> join( Service::TABLE . ' AS s' , 'c.service_id' , 's.id' )
+                -> leftJoin( EconomCampaignInclude::TABLE . ' AS i' , 'c.id' , 'i.campaign_id' )
+                -> where( 'c.is_deleted' , 0 ) -> where( 'c.is_active' , 1 )
+                -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
+                -> groupBy( 'c.id' , self ::LANG_PARAM( 'title' , '' , false ) , self ::LANG_PARAM( 'individual_text' , '' , false ) , self ::LANG_PARAM( 'corporate_text' , '' , false ) , 'c.price' , 'service_id' , 'c.photo' )
+                -> select( 'c.id' , self ::LANG_PARAM( 'title' ) , self ::LANG_PARAM( 'individual_text' ) , self ::LANG_PARAM( 'corporate_text' ) , 'c.price' , 'service_id' , DB ::raw( "GROUP_CONCAT( i.activity_id SEPARATOR ',' ) AS includes" ) , 'c.photo' )
+                -> get()
             ;
 
             $economCampaignActivities = DB ::table( EconomCampaignActivity::TABLE . ' AS a' )
-                                           -> join( Service::TABLE . ' AS s' , 'a.service_id' , 's.id' )
-                                           -> where( 'a.is_deleted' , 0 ) -> where( 'a.is_active' , 1 )
-                                           -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
-                                           -> select( 'a.id' , self ::LANG_PARAM( 'name' , 'a' ) , 'service_id' )
-                                           -> get()
+                -> join( Service::TABLE . ' AS s' , 'a.service_id' , 's.id' )
+                -> where( 'a.is_deleted' , 0 ) -> where( 'a.is_active' , 1 )
+                -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
+                -> select( 'a.id' , self ::LANG_PARAM( 'name' , 'a' ) , 'service_id' )
+                -> get()
             ;
 
             foreach( $economCampaigns as $key => $economCampaign )
@@ -57,21 +57,21 @@ class CampaignController extends Controller
 
 
             $hourlyCampaigns = DB ::table( HourlyCampaign::TABLE . ' AS c' )
-                                  -> join( Service::TABLE . ' AS s' , 'c.service_id' , 's.id' )
-                                  -> leftJoin( HourlyCampaignInclude::TABLE . ' AS i' , 'c.id' , 'i.campaign_id' )
-                                  -> where( 'c.is_deleted' , 0 ) -> where( 'c.is_active' , 1 )
-                                  -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
-                                  -> groupBy( 'c.id' , self ::LANG_PARAM( 'individual_text' , '' , false ) , self ::LANG_PARAM( 'corporate_text' , '' , false ) , 'hour' , 'day_1_price' , 'day_2_price' , 'day_3_price' , 'service_id' )
-                                  -> select( 'c.id' , self ::LANG_PARAM( 'individual_text' ) , self ::LANG_PARAM( 'corporate_text' ) , 'hour' , 'day_1_price' , 'day_2_price' , 'day_3_price' , 'service_id' , DB ::raw( "GROUP_CONCAT( i.activity_id SEPARATOR ',' ) AS includes" ) )
-                                  -> get()
+                -> join( Service::TABLE . ' AS s' , 'c.service_id' , 's.id' )
+                -> leftJoin( HourlyCampaignInclude::TABLE . ' AS i' , 'c.id' , 'i.campaign_id' )
+                -> where( 'c.is_deleted' , 0 ) -> where( 'c.is_active' , 1 )
+                -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
+                -> groupBy( 'c.id' , self ::LANG_PARAM( 'individual_text' , '' , false ) , self ::LANG_PARAM( 'corporate_text' , '' , false ) , 'hour' , 'day_1_price' , 'day_2_price' , 'day_3_price' , 'service_id' )
+                -> select( 'c.id' , self ::LANG_PARAM( 'individual_text' ) , self ::LANG_PARAM( 'corporate_text' ) , 'hour' , 'day_1_price' , 'day_2_price' , 'day_3_price' , 'service_id' , DB ::raw( "GROUP_CONCAT( i.activity_id SEPARATOR ',' ) AS includes" ) )
+                -> get()
             ;
 
             $hourlyCampaignActivities = DB ::table( HourlyCampaignActivity::TABLE . ' AS a' )
-                                           -> join( Service::TABLE . ' AS s' , 'a.service_id' , 's.id' )
-                                           -> where( 'a.is_deleted' , 0 ) -> where( 'a.is_active' , 1 )
-                                           -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
-                                           -> select( 'a.id' , self ::LANG_PARAM( 'name' , 'a' ) , 'service_id' )
-                                           -> get()
+                -> join( Service::TABLE . ' AS s' , 'a.service_id' , 's.id' )
+                -> where( 'a.is_deleted' , 0 ) -> where( 'a.is_active' , 1 )
+                -> where( 's.is_deleted' , 0 ) -> where( 's.is_active' , 1 )
+                -> select( 'a.id' , self ::LANG_PARAM( 'name' , 'a' ) , 'service_id' )
+                -> get()
             ;
 
             foreach( $hourlyCampaigns as $key => $hourlyCampaign )
@@ -87,9 +87,9 @@ class CampaignController extends Controller
                         ];
 
                         $hourlyCampaigns[ $key ] -> alerts = DB ::table( HourlyCampaignAlert::TABLE )
-                                                                -> where( 'campaign_id' , $hourlyCampaign -> id )
-                                                                -> select( 'id' , self ::LANG_PARAM( 'text' ) )
-                                                                -> get()
+                            -> where( 'campaign_id' , $hourlyCampaign -> id )
+                            -> select( 'id' , self ::LANG_PARAM( 'text' ) )
+                            -> get()
                         ;
                     }
                 }

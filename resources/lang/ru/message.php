@@ -214,4 +214,5 @@ return [
     'Date_of_entry'             => 'Giriş tarixi' ,
     'Date_of_departure'         => 'Çıxış tarixi' ,
     'Reason_of_towing'          => 'Evakuasiyanın səbəbi' ,
+    'Payment'                                                   => 'Ödəniş'
 ];

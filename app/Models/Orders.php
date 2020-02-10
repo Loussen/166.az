@@ -18,5 +18,6 @@ class Orders extends Model
             'total' ,
             'status' ,
             'is_order' ,
+            '_token' ,
         ];
 }

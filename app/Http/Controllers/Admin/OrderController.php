@@ -13,6 +13,9 @@ use App\Models\Orders;
 use App\Models\OrderServiceInputs;
 use App\Models\OrderServices;
 use App\Models\OrderTransactions;
+use App\Models\Service;
+use App\Models\ServiceInput;
+use App\Models\ServiceInputOption;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -66,20 +69,48 @@ class OrderController extends Controller
 
     public function getOrder( Request $request )
     {
-        try
-        {
+//        try
+//        {
             if( ! AdminController ::CAN( 'order.view' ) ) return response() -> json( [ 'status' => 'success' , 'warning' => 'Access denied' ] );
 
             $id = $this -> validator -> validateId( $request -> request -> get( 'id' ) );
 
             $order = Orders ::where( 'id' , $id ) -> first();
 
-            return response() -> json( [ 'status' => 'success' , 'data' => $order ] );
-        }
-        catch( \Exception $exception )
-        {
-            return $this -> getException( $exception );
-        }
+            $order_services = OrderServices::where('order_id', $order->id)->get();
+
+            $order_service_list = [];
+            foreach($order_services as $order_service) {
+                $order_service_inputs = OrderServiceInputs::where('order_service_id', $order_service->id)->get();
+                $order_service_input_list = [];
+                foreach($order_service_inputs as $order_service_input) {
+                    $service_input = ServiceInput::where('id', $order_service_input->input_id)->first();
+                    if($service_input->type == 'select') {
+                        $value = ServiceInputOption::where('id', $order_service_input->value)->first()->name_az;
+                    } else {
+                        $value = $order_service_input->value;
+                    }
+
+                    $order_service_input_list[] = [
+                        'name'  => $service_input->name_az,
+                        'value' => $value
+                    ];
+                }
+
+
+                $order_service_list[] = [
+                  'service' => Service::where('id', $order_service->service_id)->first()->name_az,
+                  'child_service' => Service::where('id', $order_service->child_service_id)->first()->name_az,
+                  'inputs'  => $order_service_input_list
+                ];
+            }
+
+            return response() -> json( [ 'status' => 'success' , 'data' => ['order' => $order, 'services' => $order_service_list]]);
+//        }
+//        catch( \Exception $exception )
+//        {
+//            return $this -> getException( $exception );
+//        }
     }
 
 

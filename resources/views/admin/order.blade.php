@@ -77,23 +77,43 @@
 @section('extra_js')
 
     <script>
-        function campaignActivities( data )
+
+        let k = 0;
+        let x = 0;
+
+        function addCampaignActivity( activity = {} )
         {
-            images( data );
+            activity.k = k++;
 
+            $( '[x-order-services]' ).append( _.template( $( 'script[x-order-service]' ).html() )( activity ) );
 
-            setTimeout( function()
+            if( activity.inputs !== undefined && activity.inputs.length )
             {
-                $( '[name="parent"][x-no-submit]' ).select2( 'trigger' , 'select' , {
-                    data : {
-                        id : data.parent_id ,
-                        text : data.parent_name
-                    }
-                } );
-            } , 55 );
+                for( let y in activity.inputs ) {
+                    addCampaignActivity1(activity.inputs[y], k);
+                }
+            }
         }
 
+        function campaignActivities( data )
+        {
+            if( data.services !== undefined && data.services.length )
+            {
+                for( let i in data.services )
+                {
+                    console.log('service');
+                    addCampaignActivity( data.services[ i ] );
+                }
+            }
+        }
 
+        function addCampaignActivity1( activity = {}, i = 0 )
+        {
+                activity.x = x++;
+                $('[x-order-service-inputs-'+(i-1)+']').append(_.template($('script[x-order-service-input]').html())(activity));
+
+
+        }
 
 
 
@@ -112,7 +132,7 @@
             <td><%= rc.id %></td>
             <td><%= rc.name %></td>
             <td><%= rc.phone %></td>
-            <td><%= rc.total %> AZN</td>
+            <td><%= parseFloat(rc.total.toFixed(2)) %> AZN</td>
             <td>
                 <% if ( rc.status == 1 ){ %>
                 <span class="badge badge-success">Paid</span>
@@ -145,25 +165,25 @@
     <script type="text/template" x-edit-modal>
         <div class="m-portlet">
             <form action="{{ route( 'admin.order.edit' ) }}" class="m-form m-form--fit m-form--label-align-right" x-edit-form>
-                <input type="hidden" name="id" value="<%= rc.id %>">
+                <input type="hidden" name="id" value="<%= rc.order.id %>">
                 <div class="m-portlet__body">
                     <div class="row">
                         <div class="col-sm-12 row">
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Name: </strong>
-                                <%= rc.name %>
+                                <%= rc.order.name %>
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Phone: </strong>
-                                <%= rc.phone %>
+                                <%= rc.order.phone %>
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Total: </strong>
-                                <%= rc.total %>
+                                <%= parseFloat(rc.order.total.toFixed(2)) %> AZN
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Type: </strong>
-                                <% if ( rc.is_order == 1 ){ %>
+                                <% if ( rc.order.is_order == 1 ){ %>
                                 <span class="badge badge-success">Order</span>
                                 <% } else { %>
                                 <span class="badge badge-danger">Calculation</span>
@@ -171,21 +191,47 @@
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Payment status: </strong>
-                                <% if ( rc.status == 1 ){ %>
+                                <% if ( rc.order.status == 1 ){ %>
                                 <span class="badge badge-success">Paid</span>
+                                <% } else if(rc.order.status == 2) { %>
+                                <span class="badge badge-danger">Failed</span>
                                 <% } else { %>
-                                <span class="badge badge-danger">Waiting</span>
+                                <span class="badge badge-warning">Waiting</span>
                                 <% }  %>
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Service count: </strong>
-                                5
+                                <%= rc.services.length %>
                             </div>
                         </div>
+                    </div>
+                    <div class="m-portlet__body" x-order-services>
                     </div>
                 </div>
             </form>
         </div>
     </script>
 
+
+    <script type="text/template" x-order-service>
+        <div class="m-portlet" x-order-service-id="" style="position: relative;">
+            <div class="m-portlet__body">
+                <h3>Xidmət #<%= rc.k+1 %></h3>
+                <div class="row">
+                    <div class="col-sm-12" >
+                        <strong>Xidmət: </strong>
+                        <%= rc.service %><% if ( rc.child_service ){ %> - <%= rc.child_service %><% }  %>
+                    </div>
+                    <% if ( rc.inputs.length ){ %><div class="m-portlet__body row col-sm-12" x-order-service-inputs-<%= rc.k %>></div><% }  %>
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" x-order-service-input>
+        <div class="col-sm-3" >
+            <strong><%= rc.name %>: </strong>
+            <%= rc.value %>
+        </div>
+    </script>
 @endsection

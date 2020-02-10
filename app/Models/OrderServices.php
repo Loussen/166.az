@@ -14,6 +14,7 @@ class OrderServices extends Model
         = [
             'order_id' ,
             'service_id' ,
+            'price' ,
             'child_service_id'
         ];
 }
