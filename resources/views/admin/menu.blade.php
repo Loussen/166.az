@@ -43,6 +43,32 @@
     </li>
 @endif
 
+@if( \App\Http\Controllers\Admin\AdminController::CAN( 'callback.view' ) )
+    <li class="m-menu__item {{ ( $currentRoute == 'admin.callback.page' ? 'm-menu__item--active' : '' ) }}" aria-haspopup="true">
+        <a href="{{ route( 'admin.callback.page' ) }}" class="m-menu__link">
+            <i class="m-menu__link-icon flaticon-refresh"></i>
+            <span class="m-menu__link-title">
+                <span class="m-menu__link-wrap">
+                    <span class="m-menu__link-text">Callback</span>
+                </span>
+            </span>
+        </a>
+    </li>
+@endif
+
+@if( \App\Http\Controllers\Admin\AdminController::CAN( 'coupon.view' ) )
+    <li class="m-menu__item {{ ( $currentRoute == 'admin.coupon.page' ? 'm-menu__item--active' : '' ) }}" aria-haspopup="true">
+        <a href="{{ route( 'admin.coupon.page' ) }}" class="m-menu__link">
+            <i class="m-menu__link-icon flaticon-refresh"></i>
+            <span class="m-menu__link-title">
+                <span class="m-menu__link-wrap">
+                    <span class="m-menu__link-text">Coupon</span>
+                </span>
+            </span>
+        </a>
+    </li>
+@endif
+
 @if( \App\Http\Controllers\Admin\AdminController::CAN( 'service.view' ) )
     <li class="m-menu__item {{ ( $currentRoute == 'admin.service.page' ? 'm-menu__item--active' : '' ) }}" aria-haspopup="true">
         <a href="{{ route( 'admin.service.page' ) }}" class="m-menu__link">

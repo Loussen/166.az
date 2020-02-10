@@ -109,8 +109,8 @@
 
         function addCampaignActivity1( activity = {}, i = 0 )
         {
-                activity.x = x++;
-                $('[x-order-service-inputs-'+(i-1)+']').append(_.template($('script[x-order-service-input]').html())(activity));
+            activity.x = x++;
+            $('[x-order-service-inputs-'+(i-1)+']').append(_.template($('script[x-order-service-input]').html())(activity));
 
 
         }
@@ -132,12 +132,20 @@
             <td><%= rc.id %></td>
             <td><%= rc.name %></td>
             <td><%= rc.phone %></td>
-            <td><%= parseFloat(rc.total.toFixed(2)) %> AZN</td>
+            <td>
+                <% if(rc.total > 0) { %>
+                <%= rc.total.toFixed(2) %> AZN
+                <% } else { %>
+                0 AZN
+                <% } %>
+            </td>
             <td>
                 <% if ( rc.status == 1 ){ %>
                 <span class="badge badge-success">Paid</span>
+                <% } else if(rc.status == 2) { %>
+                <span class="badge badge-danger">Failed</span>
                 <% } else { %>
-                <span class="badge badge-danger">Waiting</span>
+                <span class="badge badge-warning">Waiting</span>
                 <% }  %>
             </td>
             <td>
@@ -179,7 +187,11 @@
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Total: </strong>
-                                <%= parseFloat(rc.order.total.toFixed(2)) %> AZN
+                                <% if(rc.total > 0) { %>
+                                <%= rc.total.toFixed(2) %> AZN
+                                <% } else { %>
+                                0 AZN
+                                <% } %>
                             </div>
                             <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
                                 <strong>Type: </strong>
@@ -203,6 +215,16 @@
                                 <strong>Service count: </strong>
                                 <%= rc.services.length %>
                             </div>
+                            <% if ( rc.order.status == 1 ){ %>
+                            <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
+                                <strong>KapitalBank OrderId: </strong>
+                                <%= rc.transaction.OrderId %>
+                            </div>
+                            <div class="col-sm-2 form-group m-form__group" x-step step-0 step-1>
+                                <strong>KapitalBank SessionId: </strong>
+                                <%= rc.transaction.SessionId %>
+                            </div>
+                            <% }  %>
                         </div>
                     </div>
                     <div class="m-portlet__body" x-order-services>
@@ -223,8 +245,8 @@
                         <%= rc.service %><% if ( rc.child_service ){ %> - <%= rc.child_service %><% }  %>
                     </div>
                     <% if ( rc.inputs.length ){ %><div class="m-portlet__body row col-sm-12" x-order-service-inputs-<%= rc.k %>></div><% }  %>
-                </div>
             </div>
+        </div>
         </div>
     </script>
 

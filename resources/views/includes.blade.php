@@ -835,6 +835,40 @@
                 } );
             } );
 
+            $( document ).on( 'change' , '[x-activate-url-refresh]' , function( e )
+            {
+                e.stopPropagation();
+
+                loading( 1 );
+
+                let t = $( this ) , url = t.attr( 'x-activate-url-refresh' ) , xId = t.attr( 'x-modal-id' ) ,
+                    id = t.closest( '[x-tr-id]' ).attr( 'x-tr-id' ) ,
+                    active = Number( t.prop( 'checked' ) ) , column = t.attr( 'x-modal-column' );
+
+                id = xId !== undefined ? xId : id;
+
+                column = column !== undefined ? column : 'active';
+
+                $.post( url , {
+                    'id' : id ,
+                    '_token' : csrf ,
+                    [ column ] : active
+                } ).done( function( res )
+                {
+                    if( res[ 'status' ] === 'success' )
+                    {
+                        loading();
+                        $('[x-list-form]').trigger('submit');
+                    } else
+                    {
+                        error( res.exception !== undefined ? ( res.exception.message + ' | Line: ' + res.exception.line + ' | File: ' + res.exception.file ) : ( res.warning !== undefined ? res.warning : '' ) );
+                    }
+                } ).fail( function()
+                {
+                    error( 'Network error!' );
+                } );
+            } );
+
 
             $( document ).on( 'change' , '[x-change-url]' , function( e )
             {

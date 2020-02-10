@@ -76,6 +76,8 @@ class OrderController extends Controller
             $id = $this -> validator -> validateId( $request -> request -> get( 'id' ) );
 
             $order = Orders ::where( 'id' , $id ) -> first();
+            $order_transaction = OrderTransactions ::where( 'order_id' , $id ) -> first();
+            $order->transaction = $order_transaction;
 
             $order_services = OrderServices::where('order_id', $order->id)->get();
 
@@ -116,118 +118,7 @@ class OrderController extends Controller
 
     public function editOrder( Request $request )
     {
-        try
-        {
-            if( ! AdminController ::CAN( 'order.edit' ) ) return response() -> json( [ 'status' => 'success' , 'warning' => 'Access denied' ] );
 
-            $id = $this -> validator -> validateId( $request -> request -> get( 'id' ) );
-
-            $validations = $this -> validator -> validateForm(
-                $request ,
-                [
-                    'name_az' => [ 'type' => 'string' , 'required' => true , 'max' => 555 ] ,
-                    'name_en' => [ 'type' => 'string' , 'required' => true , 'max' => 555 ] ,
-                    'name_ru' => [ 'type' => 'string' , 'required' => true , 'max' => 555 ] ,
-
-                    'individual_headline_en' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-                    'individual_headline_az' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-                    'individual_headline_ru' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-
-                    'corporate_headline_en' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-                    'corporate_headline_az' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-                    'corporate_headline_ru' => [ 'type' => 'string' , 'required' => true , 'max' => 5555 ] ,
-
-                    'include_headline_en' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-                    'include_headline_az' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-                    'include_headline_ru' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-
-                    'extra_info_headline_en' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-                    'extra_info_headline_az' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-                    'extra_info_headline_ru' => [ 'type' => 'string' , 'required' => false , 'max' => 5555 ] ,
-
-                    'individual_description_en' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'individual_description_az' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'individual_description_ru' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-
-                    'corporate_description_en' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'corporate_description_az' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'corporate_description_ru' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-
-                    'seo_keywords_en'    => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'seo_keywords_az'    => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'seo_keywords_ru'    => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'seo_description_en' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'seo_description_az' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-                    'seo_description_ru' => [ 'type' => 'string' , 'required' => false , 'max' => 55555 ] ,
-
-                    'price' => [ 'type' => 'numeric' , 'required' => false ]
-                ]
-            );
-
-            if( ! count( $validations ) )
-            {
-                $order = Orders ::where( 'id' , $id ) -> first();
-
-                $parent = $this -> validator -> validateId( $request -> request -> get( 'parent' ) );
-                if( ! $parent ) $parent = null;
-
-                $parameters = [
-                    'name_en' => $request -> request -> get( 'name_en' ) ,
-                    'name_az' => $request -> request -> get( 'name_az' ) ,
-                    'name_ru' => $request -> request -> get( 'name_ru' ) ,
-
-                    'individual_headline_en' => $request -> request -> get( 'individual_headline_en' ) ,
-                    'individual_headline_az' => $request -> request -> get( 'individual_headline_az' ) ,
-                    'individual_headline_ru' => $request -> request -> get( 'individual_headline_ru' ) ,
-
-                    'corporate_headline_en' => $request -> request -> get( 'corporate_headline_en' ) ,
-                    'corporate_headline_az' => $request -> request -> get( 'corporate_headline_az' ) ,
-                    'corporate_headline_ru' => $request -> request -> get( 'corporate_headline_ru' ) ,
-
-                    'include_headline_en' => $request -> request -> get( 'include_headline_en' ) ,
-                    'include_headline_az' => $request -> request -> get( 'include_headline_az' ) ,
-                    'include_headline_ru' => $request -> request -> get( 'include_headline_ru' ) ,
-
-                    'extra_info_headline_en' => $request -> request -> get( 'extra_info_headline_en' ) ,
-                    'extra_info_headline_az' => $request -> request -> get( 'extra_info_headline_az' ) ,
-                    'extra_info_headline_ru' => $request -> request -> get( 'extra_info_headline_ru' ) ,
-
-                    'individual_description_en' => $request -> request -> get( 'individual_description_en' ) ,
-                    'individual_description_az' => $request -> request -> get( 'individual_description_az' ) ,
-                    'individual_description_ru' => $request -> request -> get( 'individual_description_ru' ) ,
-
-                    'corporate_description_en' => $request -> request -> get( 'corporate_description_en' ) ,
-                    'corporate_description_az' => $request -> request -> get( 'corporate_description_az' ) ,
-                    'corporate_description_ru' => $request -> request -> get( 'corporate_description_ru' ) ,
-
-                    'seo_keywords_en'    => $request -> request -> get( 'seo_keywords_en' ) ,
-                    'seo_keywords_az'    => $request -> request -> get( 'seo_keywords_az' ) ,
-                    'seo_keywords_ru'    => $request -> request -> get( 'seo_keywords_ru' ) ,
-                    'seo_description_en' => $request -> request -> get( 'seo_description_en' ) ,
-                    'seo_description_az' => $request -> request -> get( 'seo_description_az' ) ,
-                    'seo_description_ru' => $request -> request -> get( 'seo_description_ru' ) ,
-
-                    'price' => $request -> request -> get( 'price' ) ,
-
-                    'parent_id' => $parent
-                ];
-
-                if( $order && is_object( $order ) )
-                {
-                    DB ::table( Orders::TABLE ) -> where( 'id' , $id ) -> update( $parameters );
-                }
-                else
-                {
-                    $id = DB ::table( Orders::TABLE ) -> insertGetId( $parameters );
-                }
-            }
-
-            return response() -> json( [ 'status' => 'success' , 'validations' => $validations ] );
-        }
-        catch( \Exception $exception )
-        {
-            return $this -> getException( $exception );
-        }
     }
 
     public function deleteOrder( Request $request )

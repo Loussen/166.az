@@ -15,6 +15,8 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use App\Models\Coupon;
+use Illuminate\Support\Facades\Session;
 
 class CampaignController extends Controller
 {
@@ -120,11 +122,13 @@ class CampaignController extends Controller
 
             $campaigns = $this -> configureList( $request , $SELECT , $FROM , $WHERE , $filter , [ 'default' => 'c.start_date' ] );
 
+            //var_dump(Session::get('message'));die();
             foreach( $campaigns[ 'data' ] as $key => $campaign )
             {
                 $campaigns[ 'data' ][ $key ] -> photo = $this -> avatar( $campaign -> photo , 'campaign' );
+                $campaigns[ 'data' ][ $key ] -> message = session('message');
             }
-
+            Session::forget('message');
             return response() -> json( array_merge( [ 'status' => 'success' ] , $campaigns ) );
         }
         catch( \Exception $exception )
@@ -147,6 +151,25 @@ class CampaignController extends Controller
             $campaigns = [];
 
             return view( 'site.campaign.campaign' , compact( [ 'campaign' , 'campaigns' ] ) );
+        }
+        catch( \Exception $exception )
+        {
+            return $this -> getException( $exception );
+        }
+    }
+
+    public function sendPhone(Request $request) {
+        try
+        {
+            $validatedData = $request->validate([
+                'phone' => 'required'
+            ]);
+
+            Session::put('message', 'Sizinlə tezliklə əlaqə saxlanılacaq');
+
+
+            Coupon::insert(['phone' => $request->request->get('phone')]);
+            return redirect(route('site.campaigns.page'));
         }
         catch( \Exception $exception )
         {

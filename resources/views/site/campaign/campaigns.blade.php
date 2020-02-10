@@ -162,13 +162,17 @@
 @section('templates')
 
     <script type="text/template" x-tr>
+        <% if(rc.message) { %>
+        <div class="alert alert-success"><%= rc.message %></div>
+        <% } %>
         <div class="campaigns-discount__item">
             <img src="<%= media(rc.photo) %>" alt="">
             <div class="campaigns-discount__item--right">
                 <h3><%= rc.title %></h3>
                 <p x-customer-show x-individual><%= rc.individual_headline %></p>
                 <p x-customer-show x-corporate class="hidden"><%= rc.corporate_headline %></p>
-                <form action="" class="campaigns-discount__item--form">
+                <form method="POST" action="{{ route('site.campaigns.sendPhone') }}" class="campaigns-discount__item--form">
+                    @csrf
                     <input type="hidden" name="campaign" value="<%= rc.id %>">
                     <input name="<%= rc.input %>" placeholder="<%= translate(rc.input) %>">
                     <button>

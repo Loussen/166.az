@@ -47,6 +47,24 @@ Route ::middleware( [ 'auth' ] ) -> prefix( 'admin' ) -> name( 'admin.' ) -> gro
     Route ::post( 'order/delete' , 'Admin\OrderController@deleteOrder' ) -> name( 'order.delete' );
     Route ::post( 'order/search' , 'Admin\OrderController@getOrderSearch' ) -> name( 'order.search' );
 
+    // Callback
+    Route ::get( 'callbacks' , 'Admin\CallbackController@showCallbackPage' ) -> name( 'callback.page' );
+    Route ::post( 'callback/list' , 'Admin\CallbackController@getCallbackList' ) -> name( 'callback.list' );
+    Route ::post( 'callback' , 'Admin\CallbackController@getCallback' ) -> name( 'callback.get' );
+    Route ::post( 'callback/edit' , 'Admin\CallbackController@editCallback' ) -> name( 'callback.edit' );
+    Route ::post( 'callback/activate' , 'Admin\CallbackController@activateCallback' ) -> name( 'callback.activate' );
+    Route ::post( 'callback/delete' , 'Admin\CallbackController@deleteCallback' ) -> name( 'callback.delete' );
+    Route ::post( 'callback/search' , 'Admin\CallbackController@getCallbackSearch' ) -> name( 'callback.search' );
+
+    // Coupon
+    Route ::get( 'coupons' , 'Admin\CouponController@showCouponPage' ) -> name( 'coupon.page' );
+    Route ::post( 'coupon/list' , 'Admin\CouponController@getCouponList' ) -> name( 'coupon.list' );
+    Route ::post( 'coupon' , 'Admin\CouponController@getCoupon' ) -> name( 'coupon.get' );
+    Route ::post( 'coupon/edit' , 'Admin\CouponController@editCoupon' ) -> name( 'coupon.edit' );
+    Route ::post( 'coupon/activate' , 'Admin\CouponController@activateCoupon' ) -> name( 'coupon.activate' );
+    Route ::post( 'coupon/delete' , 'Admin\CouponController@deleteCoupon' ) -> name( 'coupon.delete' );
+    Route ::post( 'coupon/search' , 'Admin\CouponController@getCouponSearch' ) -> name( 'coupon.search' );
+
 
     // Service
     Route ::get( 'services' , 'Admin\ServiceController@showServicePage' ) -> name( 'service.page' );
@@ -246,6 +264,7 @@ Route ::middleware( [ 'language' ] ) -> prefix( '{locale?}' ) -> name( 'site.' )
     Route ::get( 'campaigns' , 'Site\CampaignController@campaignsPage' ) -> name( 'campaigns.page' );
     Route ::post( 'campaigns' , 'Site\CampaignController@getCampaignList' ) -> name( 'campaign.list' );
     Route ::get( 'campaign/{id}' , 'Site\CampaignController@campaignPage' ) -> name( 'campaign.page' );
+    Route ::post( 'campaigns/sendPhone' , 'Site\CampaignController@sendPhone' ) -> name( 'campaigns.sendPhone' );
 
     // Gallery
     Route ::get( 'gallery' , 'Site\GalleryController@gallery' ) -> name( 'gallery.page' );
